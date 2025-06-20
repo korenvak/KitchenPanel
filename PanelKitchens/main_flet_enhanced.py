@@ -813,9 +813,9 @@ class PanelKitchensApp:
                 actions_alignment=ft.MainAxisAlignment.END,
             )
 
-    self.page.dialog = dialog
-    dialog.open = True
-    self.page.update()
+            self.page.dialog = dialog
+            dialog.open = True
+            self.page.update()
 
 
 def reset_form(self, e):
