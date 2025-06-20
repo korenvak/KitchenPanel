@@ -1,4 +1,10 @@
 import flet as ft
+
+# Backwards-compatible colors reference
+try:
+    COLORS = ft.colors  # Modern versions
+except AttributeError:
+    COLORS = ft.Colors
 import pandas as pd
 
 
@@ -156,12 +162,12 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
             category_icon = get_category_icon(category)
             category_header = ft.Container(
                 content=ft.Row([
-                    ft.Icon(category_icon, size=24, color=ft.colors.WHITE),
+                    ft.Icon(category_icon, size=24, color=COLORS.WHITE),
                     ft.Text(
                         category,
                         size=20,
                         weight=ft.FontWeight.BOLD,
-                        color=ft.colors.WHITE,
+                        color=COLORS.WHITE,
                     ),
                 ]),
                 gradient=ft.LinearGradient(
@@ -175,7 +181,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
                 shadow=ft.BoxShadow(
                     spread_radius=1,
                     blur_radius=5,
-                    color=ft.colors.with_opacity(0.2, ft.colors.BLACK),
+                    color=COLORS.with_opacity(0.2, COLORS.BLACK),
                     offset=ft.Offset(0, 2),
                 ),
             )
@@ -346,7 +352,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
         shadow=ft.BoxShadow(
             spread_radius=1,
             blur_radius=10,
-            color=ft.colors.with_opacity(0.1, ft.colors.BLACK),
+            color=COLORS.with_opacity(0.1, COLORS.BLACK),
             offset=ft.Offset(0, 5),
         ),
     )

@@ -1,4 +1,10 @@
 import flet as ft
+
+# Backwards-compatible colors reference
+try:
+    COLORS = ft.colors  # Modern versions
+except AttributeError:  # Older versions use capitalized Colors
+    COLORS = ft.Colors
 from datetime import date
 import os
 import sys
@@ -218,7 +224,7 @@ class PanelKitchensApp:
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=10,
-                color=ft.colors.with_opacity(0.1, ft.colors.BLACK),
+                color=COLORS.with_opacity(0.1, COLORS.BLACK),
                 offset=ft.Offset(0, 5),
             ),
         )
@@ -343,7 +349,7 @@ class PanelKitchensApp:
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=5,
-                color=ft.colors.with_opacity(0.1, ft.colors.BLACK),
+                color=COLORS.with_opacity(0.1, COLORS.BLACK),
                 offset=ft.Offset(0, 2),
             ),
         )
@@ -444,7 +450,7 @@ class PanelKitchensApp:
                 ft.Text("צור הצעת מחיר", size=18, weight=ft.FontWeight.BOLD),
             ]),
             style=ft.ButtonStyle(
-                color={ft.MaterialState.DEFAULT: ft.colors.WHITE},
+                color={ft.MaterialState.DEFAULT: COLORS.WHITE},
                 bgcolor={ft.MaterialState.DEFAULT: "#d32f2f"},
                 padding=25,
                 animation_duration=300,
@@ -497,7 +503,7 @@ class PanelKitchensApp:
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=5,
-                color=ft.colors.with_opacity(0.1, ft.colors.BLACK),
+                color=COLORS.with_opacity(0.1, COLORS.BLACK),
                 offset=ft.Offset(0, 2),
             ),
         )
@@ -837,7 +843,7 @@ class PanelKitchensApp:
                 ft.TextButton("ביטול", on_click=close_reset_dialog),
                 ft.ElevatedButton(
                     "אפס",
-                    color=ft.colors.WHITE,
+                    color=COLORS.WHITE,
                     bgcolor="#f44336",
                     on_click=perform_reset_action,
                 ),
@@ -915,8 +921,8 @@ class PanelKitchensApp:
         self.page.show_snack_bar(
             ft.SnackBar(
                 content=ft.Row([
-                    ft.Icon(ft.icons.CHECK_CIRCLE, color=ft.colors.WHITE, size=20),
-                    ft.Text(message, color=ft.colors.WHITE),
+                    ft.Icon(ft.icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
+                    ft.Text(message, color=COLORS.WHITE),
                 ]),
                 bgcolor="#4caf50",
                 duration=3000,
@@ -929,8 +935,8 @@ class PanelKitchensApp:
         self.page.show_snack_bar(
             ft.SnackBar(
                 content=ft.Row([
-                    ft.Icon(ft.icons.ERROR, color=ft.colors.WHITE, size=20),
-                    ft.Text(message, color=ft.colors.WHITE),
+                    ft.Icon(ft.icons.ERROR, color=COLORS.WHITE, size=20),
+                    ft.Text(message, color=COLORS.WHITE),
                 ]),
                 bgcolor="#f44336",
                 duration=4000,
