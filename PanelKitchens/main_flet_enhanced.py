@@ -775,166 +775,167 @@ class PanelKitchensApp:
                 subprocess.call(['open', folder])
             close_dialog(e)
 
-            dialog = ft.AlertDialog(
-                modal=True,
-                title=ft.Row([
-                    ft.Icon(ft.icons.CHECK_CIRCLE, color="#4caf50", size=30),
-                    ft.Text("ההצעה נוצרה בהצלחה!", size=20),
-                ]),
-                content=ft.Container(
-                    content=ft.Column([
-                        ft.Text(f"הקובץ נשמר בשם:", size=16),
-                        ft.Text(os.path.basename(file_path), size=14, weight=ft.FontWeight.BOLD),
-                        ft.Container(height=10),
-                        ft.Text("מה תרצה לעשות?", size=16),
-                    ], spacing=5),
-                    width=400,
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Row([
+                ft.Icon(ft.icons.CHECK_CIRCLE, color="#4caf50", size=30),
+                ft.Text("ההצעה נוצרה בהצלחה!", size=20),
+            ]),
+            content=ft.Container(
+                content=ft.Column([
+                    ft.Text(f"הקובץ נשמר בשם:", size=16),
+                    ft.Text(os.path.basename(file_path), size=14, weight=ft.FontWeight.BOLD),
+                    ft.Container(height=10),
+                    ft.Text("מה תרצה לעשות?", size=16),
+                ], spacing=5),
+                width=400,
+            ),
+            actions=[
+                ft.TextButton(
+                    content=ft.Row([
+                        ft.Icon(ft.icons.FOLDER_OPEN, size=18),
+                        ft.Text("פתח תיקייה"),
+                    ]),
+                    on_click=open_folder,
                 ),
-                actions=[
-                    ft.TextButton(
-                        content=ft.Row([
-                            ft.Icon(ft.icons.FOLDER_OPEN, size=18),
-                            ft.Text("פתח תיקייה"),
-                        ]),
-                        on_click=open_folder,
-                    ),
-                    ft.TextButton(
-                        content=ft.Row([
-                            ft.Icon(ft.icons.PICTURE_AS_PDF, size=18),
-                            ft.Text("פתח קובץ"),
-                        ]),
-                        on_click=open_file,
-                    ),
-                    ft.TextButton(
-                        "סגור",
-                        on_click=close_dialog,
-                    ),
-                ],
-                actions_alignment=ft.MainAxisAlignment.END,
-            )
+                ft.TextButton(
+                    content=ft.Row([
+                        ft.Icon(ft.icons.PICTURE_AS_PDF, size=18),
+                        ft.Text("פתח קובץ"),
+                    ]),
+                    on_click=open_file,
+                ),
+                ft.TextButton(
+                    "סגור",
+                    on_click=close_dialog,
+                ),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
 
-    self.page.dialog = dialog
-    dialog.open = True
-    self.page.update()
-
-
-def reset_form(self, e):
-    """איפוס הטופס"""
-
-    def close_reset_dialog(e):
-        self.page.dialog.open = False
+        self.page.dialog = dialog
+        dialog.open = True
         self.page.update()
 
-    def perform_reset_action(e):
-        self.perform_reset()
 
-    dialog = ft.AlertDialog(
-        modal=True,
-        title=ft.Text("איפוס הטופס"),
-        content=ft.Text("האם אתה בטוח שברצונך לאפס את כל הנתונים?"),
-        actions=[
-            ft.TextButton("ביטול", on_click=close_reset_dialog),
-            ft.ElevatedButton(
-                "אפס",
-                color=ft.colors.WHITE,
+
+    def reset_form(self, e):
+        """איפוס הטופס"""
+
+        def close_reset_dialog(e):
+            self.page.dialog.open = False
+            self.page.update()
+
+        def perform_reset_action(e):
+            self.perform_reset()
+
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("איפוס הטופס"),
+            content=ft.Text("האם אתה בטוח שברצונך לאפס את כל הנתונים?"),
+            actions=[
+                ft.TextButton("ביטול", on_click=close_reset_dialog),
+                ft.ElevatedButton(
+                    "אפס",
+                    color=ft.colors.WHITE,
+                    bgcolor="#f44336",
+                    on_click=perform_reset_action,
+                ),
+            ],
+        )
+        self.page.dialog = dialog
+        dialog.open = True
+        self.page.update()
+
+
+    def close_dialog(self):
+        """סגירת דיאלוג"""
+        self.page.dialog.open = False
+        self.page.update()
+    
+    
+    def perform_reset(self):
+        """ביצוע איפוס"""
+        # Reset form fields
+        for field_name, field in self.page.data['form_fields'].items():
+            if hasattr(field, 'value'):
+                if field_name == 'contractor':
+                    field.value = False
+                elif field_name == 'date':
+                    field.content.controls[1].value = f"תאריך: {date.today().strftime('%d/%m/%Y')}"
+                else:
+                    field.value = ""
+    
+        # Reset state
+        self.page.data['selected_items'] = []
+        self.page.data['catalog_df'] = None
+        self.page.data['demo1'] = None
+        self.page.data['demo2'] = None
+    
+        # Reset UI
+        self.products_container.visible = False
+        self.upload_container.visible = True
+        self.tabs.selected_index = 0
+    
+        # Reset image previews
+        if hasattr(self, 'demo1_container'):
+            self.demo1_container.content.controls[2] = ft.Container(
+                content=ft.Column([
+                    ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
+                    ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
+                ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
+                width=200,
+                height=150,
+                bgcolor="#f5f5f5",
+                border=ft.border.all(2, "#e0e0e0", style=ft.BorderStyle.DASHED),
+                border_radius=10,
+                alignment=ft.alignment.center,
+            )
+    
+        if hasattr(self, 'demo2_container'):
+            self.demo2_container.content.controls[2] = ft.Container(
+                content=ft.Column([
+                    ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
+                    ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
+                ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
+                width=200,
+                height=150,
+                bgcolor="#f5f5f5",
+                border=ft.border.all(2, "#e0e0e0", style=ft.BorderStyle.DASHED),
+                border_radius=10,
+                alignment=ft.alignment.center,
+            )
+    
+        self.close_dialog()
+        self.show_success_message("הטופס אופס בהצלחה")
+    
+    
+    def show_success_message(self, message):
+        """הצגת הודעת הצלחה"""
+        self.page.show_snack_bar(
+            ft.SnackBar(
+                content=ft.Row([
+                    ft.Icon(ft.icons.CHECK_CIRCLE, color=ft.colors.WHITE, size=20),
+                    ft.Text(message, color=ft.colors.WHITE),
+                ]),
+                bgcolor="#4caf50",
+                duration=3000,
+            )
+        )
+    
+    
+    def show_error_message(self, message):
+        """הצגת הודעת שגיאה"""
+        self.page.show_snack_bar(
+            ft.SnackBar(
+                content=ft.Row([
+                    ft.Icon(ft.icons.ERROR, color=ft.colors.WHITE, size=20),
+                    ft.Text(message, color=ft.colors.WHITE),
+                ]),
                 bgcolor="#f44336",
-                on_click=perform_reset_action,
-            ),
-        ],
-    )
-    self.page.dialog = dialog
-    dialog.open = True
-    self.page.update()
-
-
-def close_dialog(self):
-    """סגירת דיאלוג"""
-    self.page.dialog.open = False
-    self.page.update()
-
-
-def perform_reset(self):
-    """ביצוע איפוס"""
-    # Reset form fields
-    for field_name, field in self.page.data['form_fields'].items():
-        if hasattr(field, 'value'):
-            if field_name == 'contractor':
-                field.value = False
-            elif field_name == 'date':
-                field.content.controls[1].value = f"תאריך: {date.today().strftime('%d/%m/%Y')}"
-            else:
-                field.value = ""
-
-    # Reset state
-    self.page.data['selected_items'] = []
-    self.page.data['catalog_df'] = None
-    self.page.data['demo1'] = None
-    self.page.data['demo2'] = None
-
-    # Reset UI
-    self.products_container.visible = False
-    self.upload_container.visible = True
-    self.tabs.selected_index = 0
-
-    # Reset image previews
-    if hasattr(self, 'demo1_container'):
-        self.demo1_container.content.controls[2] = ft.Container(
-            content=ft.Column([
-                ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
-                ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
-            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
-            width=200,
-            height=150,
-            bgcolor="#f5f5f5",
-            border=ft.border.all(2, "#e0e0e0", style=ft.BorderStyle.DASHED),
-            border_radius=10,
-            alignment=ft.alignment.center,
+                duration=4000,
+            )
         )
-
-    if hasattr(self, 'demo2_container'):
-        self.demo2_container.content.controls[2] = ft.Container(
-            content=ft.Column([
-                ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
-                ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
-            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
-            width=200,
-            height=150,
-            bgcolor="#f5f5f5",
-            border=ft.border.all(2, "#e0e0e0", style=ft.BorderStyle.DASHED),
-            border_radius=10,
-            alignment=ft.alignment.center,
-        )
-
-    self.close_dialog()
-    self.show_success_message("הטופס אופס בהצלחה")
-
-
-def show_success_message(self, message):
-    """הצגת הודעת הצלחה"""
-    self.page.show_snack_bar(
-        ft.SnackBar(
-            content=ft.Row([
-                ft.Icon(ft.icons.CHECK_CIRCLE, color=ft.colors.WHITE, size=20),
-                ft.Text(message, color=ft.colors.WHITE),
-            ]),
-            bgcolor="#4caf50",
-            duration=3000,
-        )
-    )
-
-
-def show_error_message(self, message):
-    """הצגת הודעת שגיאה"""
-    self.page.show_snack_bar(
-        ft.SnackBar(
-            content=ft.Row([
-                ft.Icon(ft.icons.ERROR, color=ft.colors.WHITE, size=20),
-                ft.Text(message, color=ft.colors.WHITE),
-            ]),
-            bgcolor="#f44336",
-            duration=4000,
-        )
-    )
 
 
 def main(page: ft.Page):
