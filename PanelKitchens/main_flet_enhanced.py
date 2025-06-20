@@ -12,6 +12,9 @@ import pandas as pd
 import asyncio
 from typing import Optional
 
+print("🚀 Starting application...")
+print(f"Python version: {sys.version}")
+
 # Handle PyInstaller paths
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
@@ -105,6 +108,8 @@ class PanelKitchensApp:
         ])
 
     def build_ui(self):
+        print(">>> build_ui called")
+
         """בניית הממשק"""
         # Progress bar for loading states
         self.progress_bar = ft.ProgressBar(
@@ -130,6 +135,7 @@ class PanelKitchensApp:
                     content=ft.Container(
                         content=self.create_customer_form(),
                         padding=20,
+                        expand=True,
                     ),
                 ),
                 ft.Tab(
@@ -138,6 +144,7 @@ class PanelKitchensApp:
                     content=ft.Container(
                         content=self.create_catalog_section(),
                         padding=20,
+                        expand=True,
                     ),
                 ),
                 ft.Tab(
@@ -146,6 +153,7 @@ class PanelKitchensApp:
                     content=ft.Container(
                         content=self.create_pdf_section(),
                         padding=20,
+                        expand=True,
                     ),
                 ),
             ],
@@ -230,6 +238,8 @@ class PanelKitchensApp:
         )
 
     def create_customer_form(self):
+        print("👤 Creating customer form...")
+
         """טופס פרטי לקוח משופר"""
         # Text fields with enhanced styling
         name_field = self.create_styled_textfield(
@@ -353,6 +363,7 @@ class PanelKitchensApp:
                 offset=ft.Offset(0, 2),
             ),
         )
+
 
     def create_styled_textfield(self, label, hint, icon=None, **kwargs):
         """יצירת שדה טקסט מעוצב"""
@@ -566,6 +577,7 @@ class PanelKitchensApp:
 
     # Event handlers
     def on_upload_hover(self, e):
+        print(f"🔄 Tab changed to: {e.control.selected_index}")
         """אפקט hover על אזור העלאה"""
         if e.data == "true":
             self.upload_container.scale = 1.02
@@ -599,10 +611,9 @@ class PanelKitchensApp:
         if show:
             await asyncio.sleep(0.1)  # Give UI time to update
 
-    def handle_catalog_picked(self, e: ft.FilePickerResultEvent):
-        """טיפול בקובץ קטלוג שנבחר"""
+    async def handle_catalog_picked(self, e: ft.FilePickerResultEvent):
         if e.files:
-            asyncio.create_task(self.load_catalog(e.files[0].path))
+            await self.load_catalog(e.files[0].path)
 
     async def load_catalog(self, file_path):
         """טעינת קטלוג עם loading animation"""
@@ -914,45 +925,55 @@ class PanelKitchensApp:
     
         self.close_dialog()
         self.show_success_message("הטופס אופס בהצלחה")
-    
-    
+
     def show_success_message(self, message):
-        """הצגת הודעת הצלחה"""
-        self.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Row([
-                    ft.Icon(ft.Icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
-                    ft.Text(message, color=COLORS.WHITE),
-                ]),
-                bgcolor="#4caf50",
-                duration=3000,
-            )
+        """הצגת הודעת הצלחה בשורת המצב (SnackBar)"""
+        # בונים את ה‑SnackBar
+        self.page.snack_bar = ft.SnackBar(
+            content=ft.Row([
+                ft.Icon(ft.Icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
+                ft.Text(message, color=COLORS.WHITE),
+            ]),
+            bgcolor="#4caf50",
+            duration=3000,
         )
-    
-    
+        # מציגים אותו
+        self.page.snack_bar.open = True
+        # מרעננים את הדף
+        self.page.update()
+
     def show_error_message(self, message):
-        """הצגת הודעת שגיאה"""
-        self.page.show_snack_bar(
-            ft.SnackBar(
-                content=ft.Row([
-                    ft.Icon(ft.Icons.ERROR, color=COLORS.WHITE, size=20),
-                    ft.Text(message, color=COLORS.WHITE),
-                ]),
-                bgcolor="#f44336",
-                duration=4000,
-            )
+        """הצגת הודעת שגיאה בשורת המצב (SnackBar)"""
+        # בונים את ה‑SnackBar
+        self.page.snack_bar = ft.SnackBar(
+            content=ft.Row([
+                ft.Icon(ft.Icons.ERROR, color=COLORS.WHITE, size=20),
+                ft.Text(message, color=COLORS.WHITE),
+            ]),
+            bgcolor="#f44336",
+            duration=4000,
         )
+        # מציגים אותו
+        self.page.snack_bar.open = True
+        # מרעננים את הדף
+        self.page.update()
 
 
 def main(page: ft.Page):
+    print("📱 Main function started")
+    print(f"Page size: {page.window.width}x{page.window.height}")
+    print(f"Page route: {page.route}")
     """נקודת כניסה ראשית"""
-    app = PanelKitchensApp(page)
+    page.app = PanelKitchensApp(page)
+
 
 
 if __name__ == "__main__":
-    # Run the app
-    ft.app(
-        target=main,
-        assets_dir="assets",
-        view=ft.AppView.FLET_APP_HIDDEN,  # For production exe
-    )
+    print("🎬 Application starting...")
+    try:
+        ft.app(target=main)
+        print("✅ Application ended normally")
+    except Exception as e:
+        print(f"💥 Application crashed: {str(e)}")
+        import traceback
+        traceback.print_exc()

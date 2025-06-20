@@ -85,7 +85,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
             summary_content.controls = [
                 ft.Container(
                     content=ft.Row([
-                        ft.Icon(ft.icons.SHOPPING_CART, size=24, color="#2196f3"),
+                        ft.Icon(ft.Icons.SHOPPING_CART, size=24, color="#2196f3"),
                         ft.Text(f"נבחרו {items_count} פריטים", size=16, weight=ft.FontWeight.W_500),
                     ]),
                     padding=10,
@@ -127,7 +127,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
     search_field = ft.TextField(
         label="חיפוש מוצר",
         hint_text="הקלד שם מוצר...",
-        prefix_icon=ft.icons.SEARCH,
+        prefix_icon=ft.Icons.SEARCH,
         border_radius=10,
         filled=True,
         fill_color="#f5f5f5",
