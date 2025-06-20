@@ -3,7 +3,7 @@ from datetime import date
 import os
 import sys
 import pandas as pd
-import asyncio
+import time
 
 # Handle PyInstaller paths
 if getattr(sys, 'frozen', False):
@@ -590,21 +590,21 @@ class PanelKitchensApp:
         # Can add validation or animation here
         pass
 
-    async def show_loading(self, show=True):
+    def show_loading(self, show=True):
         """הצגת/הסתרת loading"""
         self.progress_bar.visible = show
         self.page.update()
         if show:
-            await asyncio.sleep(0.1)  # Give UI time to update
+            time.sleep(0.1)  # Give UI time to update
 
-    async def handle_catalog_picked(self, e: ft.FilePickerResultEvent):
+    def handle_catalog_picked(self, e: ft.FilePickerResultEvent):
         """טיפול בקובץ קטלוג שנבחר"""
         if e.files:
-            await self.load_catalog(e.files[0].path)
+            self.load_catalog(e.files[0].path)
 
-    async def load_catalog(self, file_path):
+    def load_catalog(self, file_path):
         """טעינת קטלוג עם loading animation"""
-        await self.show_loading(True)
+        self.show_loading(True)
 
         try:
             catalog_df = load_catalog(file_path)
@@ -619,7 +619,7 @@ class PanelKitchensApp:
         except Exception as e:
             self.show_error_message(f"שגיאה בטעינת קטלוג: {str(e)}")
         finally:
-            await self.show_loading(False)
+            self.show_loading(False)
 
     def show_products(self, df):
         """הצגת מוצרים"""
@@ -665,10 +665,10 @@ class PanelKitchensApp:
         )
         self.page.update()
 
-    async def generate_pdf(self, e):
+    def generate_pdf(self, e):
         """יצירת PDF עם שמירה ופתיחה אוטומטית"""
         # Start loading
-        await self.show_loading(True)
+        self.show_loading(True)
 
         # Collect form data
         form_fields = self.page.data['form_fields']
@@ -685,12 +685,12 @@ class PanelKitchensApp:
 
         # Validate
         if not self.validate_form(customer_data):
-            await self.show_loading(False)
+            self.show_loading(False)
             return
 
         if not self.page.data.get('selected_items'):
             self.show_error_message("יש לבחור מוצרים להצעה")
-            await self.show_loading(False)
+            self.show_loading(False)
             return
 
         try:
@@ -734,13 +734,13 @@ class PanelKitchensApp:
             with open(save_path, 'wb') as f:
                 f.write(pdf_buffer.getvalue())
 
-            await self.show_loading(False)
+            self.show_loading(False)
 
             # Show success dialog with options
             self.show_pdf_success_dialog(save_path)
 
         except Exception as ex:
-            await self.show_loading(False)
+            self.show_loading(False)
             self.show_error_message(f"שגיאה ביצירת PDF: {str(ex)}")
 
     def show_pdf_success_dialog(self, file_path):
