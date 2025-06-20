@@ -425,6 +425,11 @@ class PanelKitchensApp:
             self.products_container,
         ], spacing=20, scroll=ft.ScrollMode.AUTO)
 
+    def _on_generate_click(self, e):
+        """Handler נקי שמוודא שהכפתור נקלט ואז מפעיל generate_pdf"""
+        print("🔘 🔘 Button clicked — now calling generate_pdf")
+        self.generate_pdf(e)
+
     def create_pdf_section(self):
         """סקציית יצירת PDF משופרת"""
         # Demo images upload
@@ -442,7 +447,7 @@ class PanelKitchensApp:
             'demo2',
         )
 
-        # Generate button with animation
+        # Generate button עם handler נקי
         generate_button = ft.ElevatedButton(
             content=ft.Row([
                 ft.Icon(ft.Icons.PICTURE_AS_PDF, size=24),
@@ -455,7 +460,7 @@ class PanelKitchensApp:
                 animation_duration=300,
                 shape=ft.RoundedRectangleBorder(radius=10),
             ),
-            on_click=self.generate_pdf,
+            on_click=self._on_generate_click,    # ← כאן
             width=300,
             height=60,
         )
@@ -486,15 +491,13 @@ class PanelKitchensApp:
                     size=20,
                     weight=ft.FontWeight.W_500,
                 ),
-                ft.Row([
-                    demo1_container,
-                    demo2_container,
-                ], spacing=20),
+                ft.Row([demo1_container, demo2_container], spacing=20),
                 ft.Container(height=30),
-                ft.Row([
-                    generate_button,
-                    reset_button,
-                ], alignment=ft.MainAxisAlignment.CENTER, spacing=20),
+                ft.Row(
+                    [generate_button, reset_button],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=20
+                ),
             ], spacing=20),
             padding=30,
             bgcolor="#ffffff",
@@ -506,6 +509,7 @@ class PanelKitchensApp:
                 offset=ft.Offset(0, 2),
             ),
         )
+
 
     def create_image_upload_area(self, title, subtitle, picker, image_key):
         """יצירת אזור העלאת תמונה"""
@@ -630,14 +634,14 @@ class PanelKitchensApp:
         self.page.update()
 
     def handle_demo1_picked(self, e: ft.FilePickerResultEvent):
-        """טיפול בתמונת הדמיה ראשונה"""
         if e.files:
+            print("📷 demo1 picked:", e.files[0].path)
             self.page.data['demo1'] = e.files[0].path
             self.update_image_preview(self.demo1_container, e.files[0].path)
 
     def handle_demo2_picked(self, e: ft.FilePickerResultEvent):
-        """טיפול בתמונת הדמיה שנייה"""
         if e.files:
+            print("📷 demo2 picked:", e.files[0].path)
             self.page.data['demo2'] = e.files[0].path
             self.update_image_preview(self.demo2_container, e.files[0].path)
 
@@ -668,85 +672,106 @@ class PanelKitchensApp:
 
     def generate_pdf(self, e):
         """יצירת PDF עם שמירה ופתיחה אוטומטית"""
-        print(">> generate_pdf() called")
+        import os, re, traceback
+        from datetime import date
+        import pandas as pd
+
+        # Debug: מציג את כל ה-state לפני הכל
+       # print("🔘 generate_pdf invoked")
+       # print("   • full page.data:", self.page.data)
+       # print("   • form_fields:", self.page.data.get('form_fields'))
+       # print("   • selected_items:", self.page.data.get('selected_items'))
+
         self.show_success_message("generate_pdf() called")
-        # Start loading
         self.show_loading(True)
 
-        # Collect form data
-        form_fields = self.page.data['form_fields']
+        # איסוף שדות
+       # print(">> collecting form fields...")
+        form_fields = self.page.data.get('form_fields', {})
         customer_data = {
-            'name': form_fields['name'].value or '',
-            'phone': form_fields['phone'].value or '',
-            'email': form_fields['email'].value or '',
-            'address': form_fields['address'].value or '',
-            'date': self.page.data['customer_data']['date'],
-            'discount': float(form_fields['discount'].value or 0),
-            'contractor': form_fields['contractor'].value,
-            'contractor_discount': float(form_fields['contractor_discount'].value or 0),
+            'name': form_fields.get('name').value or '',
+            'phone': form_fields.get('phone').value or '',
+            'email': form_fields.get('email').value or '',
+            'address': form_fields.get('address').value or '',
+            'date': self.page.data.get('customer_data', {}).get('date'),
+            'discount': float(form_fields.get('discount').value or 0),
+            'contractor': form_fields.get('contractor').value or '',
+            'contractor_discount': float(form_fields.get('contractor_discount').value or 0),
         }
+        print(f">> customer_data collected: {customer_data!r}")
 
-        # Validate
-        if not self.validate_form(customer_data):
+        # ולידציה
+        ok = self.validate_form(customer_data)
+        print(">> validate_form returned:", ok)
+        if not ok:
+            print(">> aborting after validate_form")
             self.show_loading(False)
             return
 
-        if not self.page.data.get('selected_items'):
+        # בדיקה של הפריטים הנבחרים
+        items = self.page.data.get('selected_items')
+        print(">> selected_items is:", items)
+        if not items:
+            print(">> aborting because no selected_items")
             self.show_error_message("יש לבחור מוצרים להצעה")
             self.show_loading(False)
             return
 
         try:
-            # Create DataFrame from selected items
-            selected_df = pd.DataFrame(self.page.data['selected_items'])
+            # יצירת DataFrame
+            print(">> creating DataFrame from selected_items...")
+            selected_df = pd.DataFrame(items)
+            print(f">> DataFrame created with {len(selected_df)} rows")
 
-            # Read demo images if selected
-            demo1_data = None
-            demo2_data = None
-
+            # קריאת תמונות demo במידת הצורך
+            demo1_data = demo2_data = None
             if self.page.data.get('demo1'):
+                print(">> reading demo1 image from", self.page.data['demo1'])
                 with open(self.page.data['demo1'], 'rb') as f:
                     demo1_data = f.read()
-
             if self.page.data.get('demo2'):
+                print(">> reading demo2 image from", self.page.data['demo2'])
                 with open(self.page.data['demo2'], 'rb') as f:
                     demo2_data = f.read()
 
-            # Generate PDF
-            pdf_buffer = create_enhanced_pdf(
-                customer_data,
-                selected_df,
-                demo1_data,
-                demo2_data
-            )
+            # יצירת PDF
+            print(">> calling create_enhanced_pdf...")
+            pdf_buffer = create_enhanced_pdf(customer_data, selected_df, demo1_data, demo2_data)
+            pdf_bytes = pdf_buffer.getvalue()
+            print(f">> PDF buffer length: {len(pdf_bytes)} bytes")
+            print(">> PDF header:", pdf_bytes[:4], "…", "PDF trailer:", pdf_bytes[-6:])
+            if not pdf_bytes.startswith(b'%PDF'):
+                print("‼️ Warning: buffer does not start with '%PDF'")
 
-            # Store generated bytes for optional manual saving
-            self.page.data['generated_pdf'] = pdf_buffer.getvalue()
+            # שמירת הבופר ב-page.data
+            self.page.data['generated_pdf'] = pdf_bytes
 
-            # Save PDF to Desktop
-            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-            if not os.path.exists(desktop_path):
-                desktop_path = os.path.expanduser("~")
+            # שמירת קובץ ה-PDF לדיסק
+            desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            if not os.path.isdir(desktop):
+                desktop = os.path.expanduser("~")
+            print(f">> target save path: {desktop}")
 
-            import re
             safe_name = re.sub(r'[\\/:*?"<>|]', '_', customer_data['name']) or 'לקוח'
-            file_name = f"הצעת_מחיר_{safe_name}_{date.today().strftime('%Y%m%d')}.pdf"
-            save_path = os.path.join(desktop_path, file_name)
+            filename = f"הצעת_מחיר_{safe_name}_{date.today().strftime('%Y%m%d')}.pdf"
+            save_path = os.path.join(desktop, filename)
 
-            # Write PDF
+            print(f">> writing PDF to: {save_path}")
             with open(save_path, 'wb') as f:
-                f.write(pdf_buffer.getvalue())
-            print(f"PDF saved to {save_path}")
+                f.write(pdf_bytes)
+            print(f">> PDF saved: exists? {os.path.exists(save_path)}")
             self.show_success_message(f"PDF saved to {save_path}")
 
             self.show_loading(False)
-
-            # Show success dialog with options
+            print(">> before show_pdf_success_dialog")
             self.show_pdf_success_dialog(save_path)
+            print(">> after show_pdf_success_dialog")
 
         except Exception as ex:
+            print("‼️ exception during PDF generation:", ex)
+            traceback.print_exc()
             self.show_loading(False)
-            self.show_error_message(f"שגיאה ביצירת PDF: {str(ex)}")
+            self.show_error_message(f"שגיאה ביצירת PDF: {ex}")
 
     def show_pdf_success_dialog(self, file_path):
         print("✅ show_pdf_success_dialog() called with:", file_path)
