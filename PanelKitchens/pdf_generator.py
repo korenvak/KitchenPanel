@@ -136,11 +136,11 @@ def create_enhanced_pdf(customer_data, items_df, demo1=None, demo2=None):
 
     # פרטי לקוח
     customer_details = [
-        ("📱 לכבוד:", customer_data['name']),
-        ("📅 תאריך:", customer_data['date'].strftime('%d/%m/%Y')),
-        ("☎️ טלפון:", customer_data['phone']),
-        ("✉️ דוא\"ל:", customer_data['email']),
-        ("📍 כתובת:", customer_data['address']),
+        ("לכבוד:", customer_data['name']),
+        ("תאריך:", customer_data['date'].strftime('%d/%m/%Y')),
+        ("טלפון:", customer_data['phone']),
+        ("דוא\"ל:", customer_data['email']),
+        ("כתובת:", customer_data['address']),
     ]
     for label, value in customer_details:
         draw_rtl(c, W - m, y, f"{label} {value}", font=PDF_FONT, fontsize=14)
