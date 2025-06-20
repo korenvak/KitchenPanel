@@ -161,7 +161,7 @@ class PanelKitchensApp:
                     expand=True,
                 ),
                 footer,
-            ], expand=True, spacing=0)
+            ], expand=True, spacing=0, scroll=ft.ScrollMode.AUTO)
         )
 
     def create_animated_header(self):
@@ -667,6 +667,8 @@ class PanelKitchensApp:
 
     def generate_pdf(self, e):
         """יצירת PDF עם שמירה ופתיחה אוטומטית"""
+        print(">> generate_pdf() called")
+        self.show_success_message("generate_pdf() called")
         # Start loading
         self.show_loading(True)
 
@@ -747,7 +749,7 @@ class PanelKitchensApp:
         """הצגת דיאלוג הצלחה עם אפשרויות"""
 
         def close_dialog(e):
-            dialog.open = False
+            dlg.open = False
             self.page.update()
 
         def open_pdf(e):
@@ -788,7 +790,7 @@ class PanelKitchensApp:
                 file_name=os.path.basename(file_path),
             )
 
-        dialog = ft.AlertDialog(
+        dlg = ft.AlertDialog(
             modal=True,
             title=ft.Row([
                 ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
@@ -833,8 +835,9 @@ class PanelKitchensApp:
             actions_alignment=ft.MainAxisAlignment.END,
         )
 
-        self.page.dialog = dialog
-        dialog.open = True
+        self.page.dialog = dlg
+        dlg.open = True
+        self.show_success_message("Dialog opened")
         self.page.update()
 
     def handle_save_pdf(self, e: ft.FilePickerResultEvent):
