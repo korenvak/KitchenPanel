@@ -36,6 +36,7 @@ class PanelKitchensApp:
         self.page.window_height = 900
         self.page.window_min_width = 1200
         self.page.window_min_height = 700
+        self.page.scroll = ft.ScrollMode.AUTO
 
         # אייקון לחלון
         if os.path.exists(os.path.join(base_path, 'assets', 'White_Logo.ico')):
@@ -112,7 +113,7 @@ class PanelKitchensApp:
             indicator_color="#d32f2f",
             label_color="#d32f2f",
             unselected_label_color="#666666",
-            height=self.page.window.height - 250,  # גובה דינמי
+            expand=1,
             tabs=[
                 ft.Tab(
                     text="פרטי לקוח",
@@ -161,7 +162,7 @@ class PanelKitchensApp:
                     expand=True,
                 ),
                 footer,
-            ], expand=True, spacing=0, scroll=ft.ScrollMode.AUTO)
+            ], expand=True, spacing=0)
         )
 
     def create_animated_header(self):
@@ -735,6 +736,8 @@ class PanelKitchensApp:
             # Write PDF
             with open(save_path, 'wb') as f:
                 f.write(pdf_buffer.getvalue())
+            print(f"PDF saved to {save_path}")
+            self.show_success_message(f"PDF saved to {save_path}")
 
             self.show_loading(False)
 
