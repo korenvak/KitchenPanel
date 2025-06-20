@@ -2,7 +2,7 @@ import flet as ft
 
 # Backwards-compatible colors reference
 try:
-    COLORS = ft.colors  # Modern versions
+    COLORS = ft.Colors  # Modern versions
 except AttributeError:
     COLORS = ft.Colors
 import pandas as pd
@@ -213,7 +213,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
             )
 
             minus_btn = ft.IconButton(
-                icon=ft.icons.REMOVE_CIRCLE_OUTLINE,
+                icon=ft.Icons.REMOVE_CIRCLE_OUTLINE,
                 icon_color="#d32f2f",
                 icon_size=28,
                 on_click=lambda e, i=idx: update_quantity(i, -1),
@@ -221,7 +221,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
             )
 
             plus_btn = ft.IconButton(
-                icon=ft.icons.ADD_CIRCLE_OUTLINE,
+                icon=ft.Icons.ADD_CIRCLE_OUTLINE,
                 icon_color="#4caf50",
                 icon_size=28,
                 on_click=lambda e, i=idx: update_quantity(i, 1),
@@ -387,12 +387,12 @@ def get_category_icon(category):
     """החזרת אייקון מתאים לקטגוריה"""
     # Map categories to icons - customize based on your categories
     icon_map = {
-        "מטבח": ft.icons.KITCHEN,
-        "ארונות": ft.icons.DOOR_SLIDING,
-        "משטחים": ft.icons.COUNTERTOPS,
-        "אביזרים": ft.icons.BUILD,
-        "כיורים": ft.icons.WASH,
-        "ברזים": ft.icons.WATER_DROP,
+        "מטבח": ft.Icons.KITCHEN,
+        "ארונות": ft.Icons.DOOR_SLIDING,
+        "משטחים": ft.Icons.COUNTERTOPS,
+        "אביזרים": ft.Icons.BUILD,
+        "כיורים": ft.Icons.WASH,
+        "ברזים": ft.Icons.WATER_DROP,
     }
 
     # Search for matching keyword in category
@@ -401,4 +401,4 @@ def get_category_icon(category):
             return icon
 
     # Default icon
-    return ft.icons.CATEGORY
+    return ft.Icons.CATEGORY

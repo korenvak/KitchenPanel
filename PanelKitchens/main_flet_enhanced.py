@@ -1,4 +1,5 @@
 import flet as ft
+from flet import ScrollMode
 
 # Backwards-compatible colors reference
 try:
@@ -42,7 +43,7 @@ class PanelKitchensApp:
         self.page.title = "Panel Kitchens - הצעות מחיר"
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.rtl = True
-        self.page.scroll = ft.ScrollMode.AUTO
+        #self.page.scroll = ft.ScrollMode.AUTO
         self.page.window_width = 1400
         self.page.window_height = 900
         self.page.window_min_width = 1200
@@ -240,7 +241,6 @@ class PanelKitchensApp:
     def create_customer_form(self):
         print("👤 Creating customer form...")
 
-        """טופס פרטי לקוח משופר"""
         # Text fields with enhanced styling
         name_field = self.create_styled_textfield(
             label="שם הלקוח",
@@ -257,7 +257,7 @@ class PanelKitchensApp:
         )
 
         email_field = self.create_styled_textfield(
-            label='דוא"ל',
+            label="דוא\"ל",
             hint="name@example.com",
             icon=ft.Icons.EMAIL_OUTLINED,
             keyboard_type=ft.KeyboardType.EMAIL,
@@ -318,7 +318,7 @@ class PanelKitchensApp:
             icon=ft.Icons.LOCATION_ON_OUTLINED,
         )
 
-        # Store references
+        # Store references for later validation/access
         self.page.data['form_fields'] = {
             'name': name_field,
             'phone': phone_field,
@@ -338,6 +338,7 @@ class PanelKitchensApp:
             visible=False,
         )
 
+        # Wrap everything in a Container that expands and has a subtle border for visibility
         return ft.Container(
             content=ft.Column([
                 ft.Row([
@@ -355,6 +356,7 @@ class PanelKitchensApp:
             ], spacing=20),
             padding=30,
             bgcolor="#ffffff",
+            border=ft.border.all(1, "#d32f2f"),  # זמני: להסיר או לשנות לצורך הפקה הסופית
             border_radius=15,
             shadow=ft.BoxShadow(
                 spread_radius=1,
@@ -362,8 +364,8 @@ class PanelKitchensApp:
                 color=COLORS.with_opacity(0.1, COLORS.BLACK),
                 offset=ft.Offset(0, 2),
             ),
+            expand=True,
         )
-
 
     def create_styled_textfield(self, label, hint, icon=None, **kwargs):
         """יצירת שדה טקסט מעוצב"""
@@ -577,7 +579,6 @@ class PanelKitchensApp:
 
     # Event handlers
     def on_upload_hover(self, e):
-        print(f"🔄 Tab changed to: {e.control.selected_index}")
         """אפקט hover על אזור העלאה"""
         if e.data == "true":
             self.upload_container.scale = 1.02
