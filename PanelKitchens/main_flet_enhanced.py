@@ -156,7 +156,7 @@ class PanelKitchensApp:
             ft.Container(
                 content=self.tabs,
                 expand=True,
-                animate=ft.animation.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
+                animate=ft.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
             ),
             footer,
         )
@@ -170,14 +170,14 @@ class PanelKitchensApp:
                 width=180,
                 height=70,
                 fit=ft.ImageFit.CONTAIN,
-                animate_scale=ft.animation.Animation(600, ft.AnimationCurve.BOUNCE_OUT),
+                animate_scale=ft.Animation(600, ft.AnimationCurve.BOUNCE_OUT),
             )
         else:
             logo = ft.Icon(
                 ft.icons.KITCHEN,
                 size=60,
                 color="#d32f2f",
-                animate_scale=ft.animation.Animation(600, ft.AnimationCurve.BOUNCE_OUT),
+                animate_scale=ft.Animation(600, ft.AnimationCurve.BOUNCE_OUT),
             )
 
         # Animate logo on hover
@@ -197,13 +197,13 @@ class PanelKitchensApp:
                         weight=ft.FontWeight.BOLD,
                         color="#d32f2f",
                         font_family="Heebo-Bold",
-                        animate_opacity=ft.animation.Animation(1000),
+                        animate_opacity=ft.Animation(1000),
                     ),
                     ft.Text(
                         "Panel Kitchens - מטבחים באיכות גבוהה",
                         size=18,
                         color="#666666",
-                        animate_opacity=ft.animation.Animation(1500),
+                        animate_opacity=ft.Animation(1500),
                     ),
                 ], alignment=ft.MainAxisAlignment.CENTER),
             ], alignment=ft.MainAxisAlignment.CENTER),
@@ -375,7 +375,7 @@ class PanelKitchensApp:
                     ft.icons.CLOUD_UPLOAD,
                     size=80,
                     color="#d32f2f",
-                    animate_scale=ft.animation.Animation(2000, ft.AnimationCurve.EASE_IN_OUT),
+                    animate_scale=ft.Animation(2000, ft.AnimationCurve.EASE_IN_OUT),
                 ),
                 ft.Text(
                     "גרור קובץ קטלוג לכאן או לחץ לבחירה",
@@ -398,7 +398,7 @@ class PanelKitchensApp:
             border_radius=20,
             alignment=ft.alignment.center,
             height=250,
-            animate=ft.animation.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
+            animate=ft.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
             on_hover=self.on_upload_hover,
             on_click=lambda _: self.catalog_picker.pick_files(allowed_extensions=["xlsx", "xls"]),
         )
@@ -406,8 +406,8 @@ class PanelKitchensApp:
         # Products container
         self.products_container = ft.Container(
             visible=False,
-            animate_opacity=ft.animation.Animation(500),
-            animate_scale=ft.animation.Animation(500, ft.AnimationCurve.EASE_OUT),
+            animate_opacity=ft.Animation(500),
+            animate_scale=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
         )
 
         return ft.Column([

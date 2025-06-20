@@ -189,7 +189,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
 
             # Product container with hover effect
             product_container = ft.Container(
-                animate=ft.animation.Animation(200, ft.AnimationCurve.EASE_IN_OUT),
+                animate=ft.Animation(200, ft.AnimationCurve.EASE_IN_OUT),
                 on_hover=lambda e, i=idx: on_product_hover(e, i),
             )
 
@@ -342,7 +342,7 @@ def create_products_view(page: ft.Page, catalog_df: pd.DataFrame):
         border=ft.border.all(2, "#d32f2f"),
         margin=ft.margin.only(top=20),
         visible=False,
-        animate_scale=ft.animation.Animation(300, ft.AnimationCurve.EASE_OUT),
+        animate_scale=ft.Animation(300, ft.AnimationCurve.EASE_OUT),
         shadow=ft.BoxShadow(
             spread_radius=1,
             blur_radius=10,
