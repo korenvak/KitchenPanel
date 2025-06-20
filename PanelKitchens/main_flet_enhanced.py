@@ -721,7 +721,9 @@ class PanelKitchensApp:
             if not os.path.exists(desktop_path):
                 desktop_path = os.path.expanduser("~")
 
-            file_name = f"הצעת_מחיר_{customer_data['name']}_{date.today().strftime('%Y%m%d')}.pdf"
+            import re
+            safe_name = re.sub(r'[\\/:*?"<>|]', '_', customer_data['name']) or 'לקוח'
+            file_name = f"הצעת_מחיר_{safe_name}_{date.today().strftime('%Y%m%d')}.pdf"
             save_path = os.path.join(desktop_path, file_name)
 
             # Write PDF
