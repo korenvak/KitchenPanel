@@ -126,7 +126,7 @@ class PanelKitchensApp:
             tabs=[
                 ft.Tab(
                     text="פרטי לקוח",
-                    icon=ft.icons.PERSON,
+                    icon=ft.Icons.PERSON,
                     content=ft.Container(
                         content=self.create_customer_form(),
                         padding=20,
@@ -134,7 +134,7 @@ class PanelKitchensApp:
                 ),
                 ft.Tab(
                     text="בחירת מוצרים",
-                    icon=ft.icons.SHOPPING_CART,
+                    icon=ft.Icons.SHOPPING_CART,
                     content=ft.Container(
                         content=self.create_catalog_section(),
                         padding=20,
@@ -142,7 +142,7 @@ class PanelKitchensApp:
                 ),
                 ft.Tab(
                     text="יצירת הצעה",
-                    icon=ft.icons.DESCRIPTION,
+                    icon=ft.Icons.DESCRIPTION,
                     content=ft.Container(
                         content=self.create_pdf_section(),
                         padding=20,
@@ -180,7 +180,7 @@ class PanelKitchensApp:
             )
         else:
             logo = ft.Icon(
-                ft.icons.KITCHEN,
+                ft.Icons.KITCHEN,
                 size=60,
                 color="#d32f2f",
                 animate_scale=ft.Animation(600, ft.AnimationCurve.BOUNCE_OUT),
@@ -235,28 +235,28 @@ class PanelKitchensApp:
         name_field = self.create_styled_textfield(
             label="שם הלקוח",
             hint="הזן שם מלא",
-            icon=ft.icons.PERSON_OUTLINE,
+            icon=ft.Icons.PERSON_OUTLINE,
             autofocus=True,
         )
 
         phone_field = self.create_styled_textfield(
             label="טלפון",
             hint="050-1234567",
-            icon=ft.icons.PHONE_OUTLINED,
+            icon=ft.Icons.PHONE_OUTLINED,
             keyboard_type=ft.KeyboardType.PHONE,
         )
 
         email_field = self.create_styled_textfield(
             label='דוא"ל',
             hint="name@example.com",
-            icon=ft.icons.EMAIL_OUTLINED,
+            icon=ft.Icons.EMAIL_OUTLINED,
             keyboard_type=ft.KeyboardType.EMAIL,
         )
 
         # Date picker with custom styling
         date_button = ft.ElevatedButton(
             content=ft.Row([
-                ft.Icon(ft.icons.CALENDAR_TODAY, size=20),
+                ft.Icon(ft.Icons.CALENDAR_TODAY, size=20),
                 ft.Text(f"תאריך: {self.page.data['customer_data']['date'].strftime('%d/%m/%Y')}"),
             ]),
             style=ft.ButtonStyle(
@@ -280,7 +280,7 @@ class PanelKitchensApp:
             suffix_text="%",
             width=200,
             keyboard_type=ft.KeyboardType.NUMBER,
-            icon=ft.icons.DISCOUNT_OUTLINED,
+            icon=ft.Icons.DISCOUNT_OUTLINED,
         )
 
         contractor_checkbox = ft.Checkbox(
@@ -296,7 +296,7 @@ class PanelKitchensApp:
             width=250,
             keyboard_type=ft.KeyboardType.NUMBER,
             visible=False,
-            icon=ft.icons.MONEY_OFF,
+            icon=ft.Icons.MONEY_OFF,
         )
 
         address_field = self.create_styled_textfield(
@@ -305,7 +305,7 @@ class PanelKitchensApp:
             multiline=True,
             min_lines=3,
             max_lines=3,
-            icon=ft.icons.LOCATION_ON_OUTLINED,
+            icon=ft.Icons.LOCATION_ON_OUTLINED,
         )
 
         # Store references
@@ -331,7 +331,7 @@ class PanelKitchensApp:
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.icons.PERSON, size=30, color="#d32f2f"),
+                    ft.Icon(ft.Icons.PERSON, size=30, color="#d32f2f"),
                     ft.Text("פרטי לקוח", size=28, weight=ft.FontWeight.BOLD),
                 ]),
                 ft.Divider(height=20, color="#e0e0e0"),
@@ -378,7 +378,7 @@ class PanelKitchensApp:
         self.upload_container = ft.Container(
             content=ft.Column([
                 ft.Icon(
-                    ft.icons.CLOUD_UPLOAD,
+                    ft.Icons.CLOUD_UPLOAD,
                     size=80,
                     color="#d32f2f",
                     animate_scale=ft.Animation(2000, ft.AnimationCurve.EASE_IN_OUT),
@@ -418,7 +418,7 @@ class PanelKitchensApp:
 
         return ft.Column([
             ft.Row([
-                ft.Icon(ft.icons.SHOPPING_CART, size=30, color="#d32f2f"),
+                ft.Icon(ft.Icons.SHOPPING_CART, size=30, color="#d32f2f"),
                 ft.Text("בחירת מוצרים", size=28, weight=ft.FontWeight.BOLD),
             ]),
             ft.Divider(height=20, color="#e0e0e0"),
@@ -446,7 +446,7 @@ class PanelKitchensApp:
         # Generate button with animation
         generate_button = ft.ElevatedButton(
             content=ft.Row([
-                ft.Icon(ft.icons.PICTURE_AS_PDF, size=24),
+                ft.Icon(ft.Icons.PICTURE_AS_PDF, size=24),
                 ft.Text("צור הצעת מחיר", size=18, weight=ft.FontWeight.BOLD),
             ]),
             style=ft.ButtonStyle(
@@ -464,7 +464,7 @@ class PanelKitchensApp:
         # Reset button
         reset_button = ft.OutlinedButton(
             content=ft.Row([
-                ft.Icon(ft.icons.REFRESH, size=20),
+                ft.Icon(ft.Icons.REFRESH, size=20),
                 ft.Text("התחל מחדש", size=16),
             ]),
             style=ft.ButtonStyle(
@@ -478,7 +478,7 @@ class PanelKitchensApp:
         return ft.Container(
             content=ft.Column([
                 ft.Row([
-                    ft.Icon(ft.icons.DESCRIPTION, size=30, color="#d32f2f"),
+                    ft.Icon(ft.Icons.DESCRIPTION, size=30, color="#d32f2f"),
                     ft.Text("יצירת הצעת מחיר", size=28, weight=ft.FontWeight.BOLD),
                 ]),
                 ft.Divider(height=20, color="#e0e0e0"),
@@ -516,7 +516,7 @@ class PanelKitchensApp:
                 ft.Text(subtitle, size=12, color="#666666"),
                 ft.Container(
                     content=ft.Column([
-                        ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
+                        ft.Icon(ft.Icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
                         ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
                     width=200,
@@ -552,7 +552,7 @@ class PanelKitchensApp:
                     color="#999999",
                 ),
                 ft.Text("•", size=14, color="#999999"),
-                ft.Icon(ft.icons.PHONE, size=14, color="#999999"),
+                ft.Icon(ft.Icons.PHONE, size=14, color="#999999"),
                 ft.Text(
                     "072-393-3997",
                     size=14,
@@ -654,7 +654,7 @@ class PanelKitchensApp:
                     border_radius=10,
                 ),
                 ft.Container(
-                    content=ft.Icon(ft.icons.CHECK_CIRCLE, color="white", size=30),
+                    content=ft.Icon(ft.Icons.CHECK_CIRCLE, color="white", size=30),
                     bgcolor="#4caf50",
                     border_radius=50,
                     padding=5,
@@ -784,7 +784,7 @@ class PanelKitchensApp:
         dialog = ft.AlertDialog(
             modal=True,
             title=ft.Row([
-                ft.Icon(ft.icons.CHECK_CIRCLE, color="#4caf50", size=30),
+                ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
                 ft.Text("ההצעה נוצרה בהצלחה!", size=20),
             ]),
             content=ft.Container(
@@ -799,14 +799,14 @@ class PanelKitchensApp:
             actions=[
                 ft.TextButton(
                     content=ft.Row([
-                        ft.Icon(ft.icons.FOLDER_OPEN, size=18),
+                        ft.Icon(ft.Icons.FOLDER_OPEN, size=18),
                         ft.Text("פתח תיקייה"),
                     ]),
                     on_click=open_folder,
                 ),
                 ft.TextButton(
                     content=ft.Row([
-                        ft.Icon(ft.icons.PICTURE_AS_PDF, size=18),
+                        ft.Icon(ft.Icons.PICTURE_AS_PDF, size=18),
                         ft.Text("פתח קובץ"),
                     ]),
                     on_click=open_file,
@@ -887,7 +887,7 @@ class PanelKitchensApp:
         if hasattr(self, 'demo1_container'):
             self.demo1_container.content.controls[2] = ft.Container(
                 content=ft.Column([
-                    ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
+                    ft.Icon(ft.Icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
                     ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
                 width=200,
@@ -901,7 +901,7 @@ class PanelKitchensApp:
         if hasattr(self, 'demo2_container'):
             self.demo2_container.content.controls[2] = ft.Container(
                 content=ft.Column([
-                    ft.Icon(ft.icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
+                    ft.Icon(ft.Icons.ADD_PHOTO_ALTERNATE, size=50, color="#666666"),
                     ft.Text("לחץ להוספת תמונה", size=14, color="#666666"),
                 ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=5),
                 width=200,
@@ -921,7 +921,7 @@ class PanelKitchensApp:
         self.page.show_snack_bar(
             ft.SnackBar(
                 content=ft.Row([
-                    ft.Icon(ft.icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
+                    ft.Icon(ft.Icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
                     ft.Text(message, color=COLORS.WHITE),
                 ]),
                 bgcolor="#4caf50",
@@ -935,7 +935,7 @@ class PanelKitchensApp:
         self.page.show_snack_bar(
             ft.SnackBar(
                 content=ft.Row([
-                    ft.Icon(ft.icons.ERROR, color=COLORS.WHITE, size=20),
+                    ft.Icon(ft.Icons.ERROR, color=COLORS.WHITE, size=20),
                     ft.Text(message, color=COLORS.WHITE),
                 ]),
                 bgcolor="#f44336",
