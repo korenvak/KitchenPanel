@@ -820,17 +820,25 @@ class PanelKitchensApp:
 
 def reset_form(self, e):
     """איפוס הטופס"""
+
+    def close_reset_dialog(e):
+        self.page.dialog.open = False
+        self.page.update()
+
+    def perform_reset_action(e):
+        self.perform_reset()
+
     dialog = ft.AlertDialog(
         modal=True,
         title=ft.Text("איפוס הטופס"),
         content=ft.Text("האם אתה בטוח שברצונך לאפס את כל הנתונים?"),
         actions=[
-            ft.TextButton("ביטול", on_click=lambda e: self.close_dialog()),
+            ft.TextButton("ביטול", on_click=close_reset_dialog),
             ft.ElevatedButton(
                 "אפס",
                 color=ft.colors.WHITE,
                 bgcolor="#f44336",
-                on_click=lambda e: self.perform_reset(),
+                on_click=perform_reset_action,
             ),
         ],
     )
