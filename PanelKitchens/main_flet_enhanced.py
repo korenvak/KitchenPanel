@@ -111,7 +111,6 @@ class PanelKitchensApp:
     def build_ui(self):
         print(">>> build_ui called")
 
-        """בניית הממשק"""
         # Progress bar for loading states
         self.progress_bar = ft.ProgressBar(
             visible=False,
@@ -119,10 +118,10 @@ class PanelKitchensApp:
             bgcolor="#ffebee",
         )
 
-        # Header
+        # Header (קבוע למעלה)
         header = self.create_animated_header()
 
-        # Main content with tabs
+        # הגדרת הכרטיסיות (Tabs), עם גלילה רק בכל תוכן טאב
         self.tabs = ft.Tabs(
             selected_index=0,
             animation_duration=300,
@@ -130,29 +129,44 @@ class PanelKitchensApp:
             label_color="#d32f2f",
             unselected_label_color="#666666",
             tabs=[
+                # טאב 1: פרטי לקוח
                 ft.Tab(
                     text="פרטי לקוח",
                     icon=ft.Icons.PERSON,
                     content=ft.Container(
-                        content=self.create_customer_form(),
+                        content=ft.Column(
+                            controls=[self.create_customer_form()],
+                            scroll=ScrollMode.AUTO,
+                            expand=True,
+                        ),
                         padding=20,
                         expand=True,
                     ),
                 ),
+                # טאב 2: בחירת מוצרים
                 ft.Tab(
                     text="בחירת מוצרים",
                     icon=ft.Icons.SHOPPING_CART,
                     content=ft.Container(
-                        content=self.create_catalog_section(),
+                        content=ft.Column(
+                            controls=[self.create_catalog_section()],
+                            scroll=ScrollMode.AUTO,
+                            expand=True,
+                        ),
                         padding=20,
                         expand=True,
                     ),
                 ),
+                # טאב 3: יצירת הצעה
                 ft.Tab(
                     text="יצירת הצעה",
                     icon=ft.Icons.DESCRIPTION,
                     content=ft.Container(
-                        content=self.create_pdf_section(),
+                        content=ft.Column(
+                            controls=[self.create_pdf_section()],
+                            scroll=ScrollMode.AUTO,
+                            expand=True,
+                        ),
                         padding=20,
                         expand=True,
                     ),
@@ -161,18 +175,14 @@ class PanelKitchensApp:
             on_change=self.on_tab_change,
         )
 
-        # Footer
+        # Footer (קבוע למטה)
         footer = self.create_footer()
 
-        # Add all to page with animation
+        # הוספה סופית של כל הרכיבים ל־Page
         self.page.add(
             self.progress_bar,
             header,
-            ft.Container(
-                content=self.tabs,
-                expand=True,
-                animate=ft.Animation(300, ft.AnimationCurve.EASE_IN_OUT),
-            ),
+            self.tabs,
             footer,
         )
 
