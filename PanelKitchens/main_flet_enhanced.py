@@ -749,99 +749,102 @@ class PanelKitchensApp:
             self.show_error_message(f"שגיאה ביצירת PDF: {str(ex)}")
 
     def show_pdf_success_dialog(self, file_path):
-        """הצגת דיאלוג הצלחה עם אפשרויות"""
+        print("✅ show_pdf_success_dialog() called with:", file_path)
 
-        def close_dialog(e):
-            dlg.open = False
-            self.page.update()
+        try:
+            def close_dialog(e):
+                print("🟨 dialog closed")
+                self.page.dialog.open = False
+                self.page.update()
 
-        def open_pdf(e):
-            """פתיחת קובץ PDF"""
-            import subprocess
-            import platform
-            try:
-                if platform.system() == 'Windows':
-                    os.startfile(file_path)
-                elif platform.system() == 'Darwin':  # macOS
-                    subprocess.call(['open', file_path])
-                else:  # linux
-                    subprocess.call(['xdg-open', file_path])
-            except Exception as ex:
-                self.show_error_message(f"שגיאה בפתיחת הקובץ: {str(ex)}")
-            close_dialog(e)
+            def open_pdf(e):
+                print("🟩 trying to open PDF:", file_path)
+                import subprocess, platform
+                try:
+                    if platform.system() == 'Windows':
+                        os.startfile(file_path)
+                    elif platform.system() == 'Darwin':
+                        subprocess.call(['open', file_path])
+                    else:
+                        subprocess.call(['xdg-open', file_path])
+                except Exception as ex:
+                    print(f"❌ error opening file: {ex}")
+                    self.show_error_message(f"שגיאה בפתיחת הקובץ: {str(ex)}")
+                close_dialog(e)
 
-        def open_folder(e):
-            """פתיחת תיקייה"""
-            import subprocess
-            import platform
-            try:
+            def open_folder(e):
                 folder = os.path.dirname(file_path)
-                if platform.system() == 'Windows':
-                    subprocess.Popen(f'explorer /select,"{file_path}"')
-                elif platform.system() == 'Darwin':  # macOS
-                    subprocess.call(['open', '-R', file_path])
-                else:  # linux
-                    subprocess.call(['xdg-open', folder])
-            except Exception as ex:
-                self.show_error_message(f"שגיאה בפתיחת התיקייה: {str(ex)}")
-            close_dialog(e)
+                print("🟦 trying to open folder:", folder)
+                import subprocess, platform
+                try:
+                    if platform.system() == 'Windows':
+                        subprocess.Popen(f'explorer /select,"{file_path}"')
+                    elif platform.system() == 'Darwin':
+                        subprocess.call(['open', '-R', file_path])
+                    else:
+                        subprocess.call(['xdg-open', folder])
+                except Exception as ex:
+                    print(f"❌ error opening folder: {ex}")
+                    self.show_error_message(f"שגיאה בפתיחת התיקייה: {str(ex)}")
+                close_dialog(e)
 
-        def save_as(e):
-            """שמירה ידנית של ה-PDF"""
-            self.save_picker.save_file(
-                allowed_extensions=["pdf"],
-                file_name=os.path.basename(file_path),
+            def save_as(e):
+                print("💾 save_as clicked")
+                self.save_picker.save_file(
+                    allowed_extensions=["pdf"],
+                    file_name=os.path.basename(file_path),
+                )
+
+            dlg = ft.AlertDialog(
+                modal=True,
+                title=ft.Row([
+                    ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
+                    ft.Text("ההצעה נוצרה בהצלחה!", size=20),
+                ]),
+                content=ft.Container(
+                    content=ft.Column([
+                        ft.Text("הקובץ נשמר ב:", size=16),
+                        ft.Text(file_path, size=14, weight=ft.FontWeight.BOLD, selectable=True),
+                        ft.Container(height=10),
+                        ft.Text("מה תרצה לעשות?", size=16),
+                    ], spacing=5),
+                    width=500,
+                ),
+                actions=[
+                    ft.TextButton(
+                        content=ft.Row([
+                            ft.Icon(ft.Icons.PICTURE_AS_PDF, size=18),
+                            ft.Text("פתח את ה-PDF"),
+                        ]),
+                        on_click=open_pdf,
+                    ),
+                    ft.TextButton(
+                        content=ft.Row([
+                            ft.Icon(ft.Icons.FOLDER_OPEN, size=18),
+                            ft.Text("פתח תיקייה"),
+                        ]),
+                        on_click=open_folder,
+                    ),
+                    ft.TextButton(
+                        content=ft.Row([
+                            ft.Icon(ft.Icons.SAVE_AS, size=18),
+                            ft.Text("שמור בשם"),
+                        ]),
+                        on_click=save_as,
+                    ),
+                    ft.TextButton("סגור", on_click=close_dialog),
+                ],
+                actions_alignment=ft.MainAxisAlignment.END,
             )
 
-        dlg = ft.AlertDialog(
-            modal=True,
-            title=ft.Row([
-                ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
-                ft.Text("ההצעה נוצרה בהצלחה!", size=20),
-            ]),
-            content=ft.Container(
-                content=ft.Column([
-                    ft.Text(f"הקובץ נשמר ב:", size=16),
-                    ft.Text(file_path, size=14, weight=ft.FontWeight.BOLD, selectable=True),
-                    ft.Container(height=10),
-                    ft.Text("מה תרצה לעשות?", size=16),
-                ], spacing=5),
-                width=500,
-            ),
-            actions=[
-                ft.TextButton(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.PICTURE_AS_PDF, size=18),
-                        ft.Text("פתח את ה-PDF"),
-                    ]),
-                    on_click=open_pdf,
-                ),
-                ft.TextButton(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.FOLDER_OPEN, size=18),
-                        ft.Text("פתח תיקייה"),
-                    ]),
-                    on_click=open_folder,
-                ),
-                ft.TextButton(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.SAVE_AS, size=18),
-                        ft.Text("שמור בשם"),
-                    ]),
-                    on_click=save_as,
-                ),
-                ft.TextButton(
-                    "סגור",
-                    on_click=close_dialog,
-                ),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
+            self.page.dialog = dlg
+            dlg.open = True
+            self.page.update()
+            print("✅ Dialog shown successfully")
 
-        self.page.dialog = dlg
-        dlg.open = True
-        self.show_success_message("Dialog opened")
-        self.page.update()
+        except Exception as ex:
+            print(f"❌ Error showing dialog: {ex}")
+            self.show_error_message(f"שגיאה בהצגת חלון הצלחה: {str(ex)}")
 
     def handle_save_pdf(self, e: ft.FilePickerResultEvent):
         """שמירה של קובץ ה-PDF שנוצר"""
