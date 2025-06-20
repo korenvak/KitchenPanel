@@ -101,11 +101,14 @@ class PanelKitchensApp:
         self.catalog_picker = ft.FilePicker(on_result=self.handle_catalog_picked)
         self.demo1_picker = ft.FilePicker(on_result=self.handle_demo1_picked)
         self.demo2_picker = ft.FilePicker(on_result=self.handle_demo2_picked)
+        # Picker for saving generated PDF
+        self.save_pdf_picker = ft.FilePicker(on_result=self.handle_save_pdf)
 
         self.page.overlay.extend([
             self.catalog_picker,
             self.demo1_picker,
             self.demo2_picker,
+            self.save_pdf_picker,
         ])
 
     def build_ui(self):
@@ -689,6 +692,21 @@ class PanelKitchensApp:
         )
         self.page.update()
 
+    def handle_save_pdf(self, e: ft.FilePickerResultEvent):
+        """שומר את קובץ ה-PDF שנוצר למיקום שנבחר"""
+        pdf_bytes = self.page.data.get('generated_pdf')
+        if e.path and pdf_bytes:
+            try:
+                with open(e.path, 'wb') as f:
+                    f.write(pdf_bytes)
+                # Clear stored bytes after saving
+                self.page.data['generated_pdf'] = None
+                self.show_success_dialog(e.path)
+            except Exception as ex:
+                self.show_error_message(f"שגיאה בשמירת הקובץ: {ex}")
+        else:
+            self.show_error_message("שמירת הקובץ בוטלה")
+
     async def generate_pdf(self, e):
         """יצירת PDF עם אנימציה"""
         # Start loading
@@ -741,17 +759,14 @@ class PanelKitchensApp:
                 demo2_data
             )
 
-            # Save PDF
+            # Prepare PDF for download
             file_name = f"הצעת_מחיר_{customer_data['name']}_{date.today().strftime('%Y%m%d')}.pdf"
-            save_path = os.path.join(os.path.expanduser("~"), "Desktop", file_name)
-
-            with open(save_path, 'wb') as f:
-                f.write(pdf_buffer.getvalue())
+            self.page.data['generated_pdf'] = pdf_buffer.getvalue()
 
             await self.show_loading(False)
 
-            # Show success with animation
-            self.show_success_dialog(save_path)
+            # Open save dialog
+            self.save_pdf_picker.save_file(file_name=file_name)
 
         except Exception as ex:
             await self.show_loading(False)

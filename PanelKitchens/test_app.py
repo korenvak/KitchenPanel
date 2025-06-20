@@ -156,6 +156,39 @@ def test_pdf_generation():
         return False
 
 
+def test_pdf_save_logic():
+    """בדיקה שמנגנון שמירת ה-PDF כותב לקובץ"""
+    try:
+        from main_flet_enhanced import PanelKitchensApp
+        import flet as ft
+        import tempfile
+
+        result = True
+
+        def test_page(page: ft.Page):
+            app = PanelKitchensApp(page)
+            sample_bytes = b"test pdf"
+            page.data['generated_pdf'] = sample_bytes
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".pdf")
+            os.close(tmp_fd)
+            class E:
+                path = tmp_path
+            app.handle_save_pdf(E())
+            if os.path.getsize(tmp_path) == len(sample_bytes):
+                print("✅ שמירת קובץ עובדת")
+            else:
+                print("❌ כשל בשמירת הקובץ")
+                result = False
+            os.remove(tmp_path)
+            page.window.close()
+
+        ft.app(target=test_page, view=ft.AppView.FLET_APP_HIDDEN)
+        return result
+    except Exception as e:
+        print(f"❌ שגיאה בבדיקת שמירה: {e}")
+        return False
+
+
 def create_test_report():
     """יצירת דוח בדיקה"""
     report_name = f"test_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
@@ -174,6 +207,7 @@ def create_test_report():
             ("App Launch", test_app_launch),
             ("Catalog Loading", test_catalog_loading),
             ("PDF Generation", test_pdf_generation),
+            ("PDF Save", test_pdf_save_logic),
         ]
 
         all_passed = True
