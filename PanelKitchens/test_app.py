@@ -84,12 +84,12 @@ def test_app_launch():
             try:
                 app = PanelKitchensApp(page)
                 print("✅ האפליקציה נטענה בהצלחה")
-                page.window_close()
+                page.window.close()
             except Exception as e:
                 print(f"❌ שגיאה בטעינת האפליקציה: {e}")
                 traceback.print_exc()
                 test_passed = False
-                page.window_close()
+                page.window.close()
 
         # Run quick test
         ft.app(target=test_page, view=ft.AppView.FLET_APP_HIDDEN)
