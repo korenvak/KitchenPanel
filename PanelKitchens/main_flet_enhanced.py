@@ -1,20 +1,10 @@
 import flet as ft
-from flet import ScrollMode
-
-# Backwards-compatible colors reference
-try:
-    COLORS = ft.colors  # Modern versions
-except AttributeError:  # Older versions use capitalized Colors
-    COLORS = ft.Colors
 from datetime import date
 import os
 import sys
 import pandas as pd
 import asyncio
 from typing import Optional
-
-print("🚀 Starting application...")
-print(f"Python version: {sys.version}")
 
 # Handle PyInstaller paths
 if getattr(sys, 'frozen', False):
@@ -43,7 +33,6 @@ class PanelKitchensApp:
         self.page.title = "Panel Kitchens - הצעות מחיר"
         self.page.theme_mode = ft.ThemeMode.LIGHT
         self.page.rtl = True
-        #self.page.scroll = ft.ScrollMode.AUTO
         self.page.window_width = 1400
         self.page.window_height = 900
         self.page.window_min_width = 1200
@@ -61,11 +50,6 @@ class PanelKitchensApp:
                 surface="#f5f5f5",
                 background="#ffffff",
                 error="#f44336",
-            ),
-            page_transitions=ft.PageTransitionsTheme(
-                android=ft.PageTransitionTheme.OPEN_UPWARDS,
-                ios=ft.PageTransitionTheme.CUPERTINO,
-                windows=ft.PageTransitionTheme.FADE_UPWARDS,
             ),
         )
 
@@ -101,92 +85,82 @@ class PanelKitchensApp:
         self.catalog_picker = ft.FilePicker(on_result=self.handle_catalog_picked)
         self.demo1_picker = ft.FilePicker(on_result=self.handle_demo1_picked)
         self.demo2_picker = ft.FilePicker(on_result=self.handle_demo2_picked)
-        # Picker for saving generated PDF
-        self.save_pdf_picker = ft.FilePicker(on_result=self.handle_save_pdf)
 
         self.page.overlay.extend([
             self.catalog_picker,
             self.demo1_picker,
             self.demo2_picker,
-            self.save_pdf_picker,
         ])
 
     def build_ui(self):
-        print(">>> build_ui called")
-
-        # Progress bar for loading states
+        """בניית הממשק - גרסה מתוקנת עם גלילה נכונה"""
+        # Progress bar
         self.progress_bar = ft.ProgressBar(
             visible=False,
             color="#d32f2f",
             bgcolor="#ffebee",
         )
 
-        # Header (קבוע למעלה)
+        # Header - קבוע למעלה
         header = self.create_animated_header()
 
-        # הגדרת הכרטיסיות (Tabs), עם גלילה רק בכל תוכן טאב
+        # Main content area with tabs - זה החלק שיגלול
         self.tabs = ft.Tabs(
             selected_index=0,
             animation_duration=300,
             indicator_color="#d32f2f",
             label_color="#d32f2f",
             unselected_label_color="#666666",
+            height=self.page.window.height - 250,  # גובה דינמי
             tabs=[
-                # טאב 1: פרטי לקוח
                 ft.Tab(
                     text="פרטי לקוח",
                     icon=ft.Icons.PERSON,
                     content=ft.Container(
                         content=ft.Column(
                             controls=[self.create_customer_form()],
-                            scroll=ScrollMode.AUTO,
-                            expand=True,
+                            scroll=ft.ScrollMode.AUTO,
                         ),
                         padding=20,
-                        expand=True,
                     ),
                 ),
-                # טאב 2: בחירת מוצרים
                 ft.Tab(
                     text="בחירת מוצרים",
                     icon=ft.Icons.SHOPPING_CART,
                     content=ft.Container(
-                        content=ft.Column(
-                            controls=[self.create_catalog_section()],
-                            scroll=ScrollMode.AUTO,
-                            expand=True,
-                        ),
+                        content=self.create_catalog_section(),
                         padding=20,
-                        expand=True,
                     ),
                 ),
-                # טאב 3: יצירת הצעה
                 ft.Tab(
                     text="יצירת הצעה",
                     icon=ft.Icons.DESCRIPTION,
                     content=ft.Container(
                         content=ft.Column(
                             controls=[self.create_pdf_section()],
-                            scroll=ScrollMode.AUTO,
-                            expand=True,
+                            scroll=ft.ScrollMode.AUTO,
                         ),
                         padding=20,
-                        expand=True,
                     ),
                 ),
             ],
             on_change=self.on_tab_change,
         )
 
-        # Footer (קבוע למטה)
+        # Footer - קבוע למטה
         footer = self.create_footer()
 
-        # הוספה סופית של כל הרכיבים ל־Page
+        # Main layout
         self.page.add(
-            self.progress_bar,
-            header,
-            self.tabs,
-            footer,
+            ft.Column([
+                self.progress_bar,
+                header,
+                ft.Container(
+                    content=self.tabs,
+                    expand=True,
+                ),
+                footer,
+            ], expand=True, spacing=0)
         )
 
     def create_animated_header(self):
@@ -246,14 +220,13 @@ class PanelKitchensApp:
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=10,
-                color=COLORS.with_opacity(0.1, COLORS.BLACK),
+                color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
                 offset=ft.Offset(0, 5),
             ),
         )
 
     def create_customer_form(self):
-        print("👤 Creating customer form...")
-
+        """טופס פרטי לקוח משופר"""
         # Text fields with enhanced styling
         name_field = self.create_styled_textfield(
             label="שם הלקוח",
@@ -270,7 +243,7 @@ class PanelKitchensApp:
         )
 
         email_field = self.create_styled_textfield(
-            label="דוא\"ל",
+            label='דוא"ל',
             hint="name@example.com",
             icon=ft.Icons.EMAIL_OUTLINED,
             keyboard_type=ft.KeyboardType.EMAIL,
@@ -331,7 +304,7 @@ class PanelKitchensApp:
             icon=ft.Icons.LOCATION_ON_OUTLINED,
         )
 
-        # Store references for later validation/access
+        # Store references
         self.page.data['form_fields'] = {
             'name': name_field,
             'phone': phone_field,
@@ -351,7 +324,6 @@ class PanelKitchensApp:
             visible=False,
         )
 
-        # Wrap everything in a Container that expands and has a subtle border for visibility
         return ft.Container(
             content=ft.Column([
                 ft.Row([
@@ -369,15 +341,13 @@ class PanelKitchensApp:
             ], spacing=20),
             padding=30,
             bgcolor="#ffffff",
-            border=ft.border.all(1, "#d32f2f"),  # זמני: להסיר או לשנות לצורך הפקה הסופית
             border_radius=15,
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=5,
-                color=COLORS.with_opacity(0.1, COLORS.BLACK),
+                color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
                 offset=ft.Offset(0, 2),
             ),
-            expand=True,
         )
 
     def create_styled_textfield(self, label, hint, icon=None, **kwargs):
@@ -399,7 +369,7 @@ class PanelKitchensApp:
         )
 
     def create_catalog_section(self):
-        """סקציית בחירת קטלוג משופרת"""
+        """סקציית בחירת קטלוג משופרת - עם גלילה מתוקנת"""
         # Upload area with animation
         self.upload_container = ft.Container(
             content=ft.Column([
@@ -435,13 +405,14 @@ class PanelKitchensApp:
             on_click=lambda _: self.catalog_picker.pick_files(allowed_extensions=["xlsx", "xls"]),
         )
 
-        # Products container
+        # Products container - זה החלק שצריך לגלול
         self.products_container = ft.Container(
             visible=False,
             animate_opacity=ft.Animation(500),
             animate_scale=ft.Animation(500, ft.AnimationCurve.EASE_OUT),
         )
 
+        # Return scrollable column
         return ft.Column([
             ft.Row([
                 ft.Icon(ft.Icons.SHOPPING_CART, size=30, color="#d32f2f"),
@@ -450,7 +421,7 @@ class PanelKitchensApp:
             ft.Divider(height=20, color="#e0e0e0"),
             self.upload_container,
             self.products_container,
-        ], spacing=20)
+        ], spacing=20, scroll=ft.ScrollMode.AUTO)
 
     def create_pdf_section(self):
         """סקציית יצירת PDF משופרת"""
@@ -476,7 +447,7 @@ class PanelKitchensApp:
                 ft.Text("צור הצעת מחיר", size=18, weight=ft.FontWeight.BOLD),
             ]),
             style=ft.ButtonStyle(
-                color={ft.ControlState.DEFAULT: COLORS.WHITE},
+                color={ft.ControlState.DEFAULT: ft.Colors.WHITE},
                 bgcolor={ft.ControlState.DEFAULT: "#d32f2f"},
                 padding=25,
                 animation_duration=300,
@@ -529,7 +500,7 @@ class PanelKitchensApp:
             shadow=ft.BoxShadow(
                 spread_radius=1,
                 blur_radius=5,
-                color=COLORS.with_opacity(0.1, COLORS.BLACK),
+                color=ft.Colors.with_opacity(0.1, ft.Colors.BLACK),
                 offset=ft.Offset(0, 2),
             ),
         )
@@ -626,6 +597,7 @@ class PanelKitchensApp:
             await asyncio.sleep(0.1)  # Give UI time to update
 
     async def handle_catalog_picked(self, e: ft.FilePickerResultEvent):
+        """טיפול בקובץ קטלוג שנבחר"""
         if e.files:
             await self.load_catalog(e.files[0].path)
 
@@ -692,23 +664,8 @@ class PanelKitchensApp:
         )
         self.page.update()
 
-    def handle_save_pdf(self, e: ft.FilePickerResultEvent):
-        """שומר את קובץ ה-PDF שנוצר למיקום שנבחר"""
-        pdf_bytes = self.page.data.get('generated_pdf')
-        if e.path and pdf_bytes:
-            try:
-                with open(e.path, 'wb') as f:
-                    f.write(pdf_bytes)
-                # Clear stored bytes after saving
-                self.page.data['generated_pdf'] = None
-                self.show_success_dialog(e.path)
-            except Exception as ex:
-                self.show_error_message(f"שגיאה בשמירת הקובץ: {ex}")
-        else:
-            self.show_error_message("שמירת הקובץ בוטלה")
-
     async def generate_pdf(self, e):
-        """יצירת PDF עם אנימציה"""
+        """יצירת PDF עם שמירה ופתיחה אוטומטית"""
         # Start loading
         await self.show_loading(True)
 
@@ -759,18 +716,106 @@ class PanelKitchensApp:
                 demo2_data
             )
 
-            # Prepare PDF for download
+            # Save PDF to Desktop
+            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+            if not os.path.exists(desktop_path):
+                desktop_path = os.path.expanduser("~")
+
             file_name = f"הצעת_מחיר_{customer_data['name']}_{date.today().strftime('%Y%m%d')}.pdf"
-            self.page.data['generated_pdf'] = pdf_buffer.getvalue()
+            save_path = os.path.join(desktop_path, file_name)
+
+            # Write PDF
+            with open(save_path, 'wb') as f:
+                f.write(pdf_buffer.getvalue())
 
             await self.show_loading(False)
 
-            # Open save dialog
-            self.save_pdf_picker.save_file(file_name=file_name)
+            # Show success dialog with options
+            self.show_pdf_success_dialog(save_path)
 
         except Exception as ex:
             await self.show_loading(False)
             self.show_error_message(f"שגיאה ביצירת PDF: {str(ex)}")
+
+    def show_pdf_success_dialog(self, file_path):
+        """הצגת דיאלוג הצלחה עם אפשרויות"""
+
+        def close_dialog(e):
+            dialog.open = False
+            self.page.update()
+
+        def open_pdf(e):
+            """פתיחת קובץ PDF"""
+            import subprocess
+            import platform
+            try:
+                if platform.system() == 'Windows':
+                    os.startfile(file_path)
+                elif platform.system() == 'Darwin':  # macOS
+                    subprocess.call(['open', file_path])
+                else:  # linux
+                    subprocess.call(['xdg-open', file_path])
+            except Exception as ex:
+                self.show_error_message(f"שגיאה בפתיחת הקובץ: {str(ex)}")
+            close_dialog(e)
+
+        def open_folder(e):
+            """פתיחת תיקייה"""
+            import subprocess
+            import platform
+            try:
+                folder = os.path.dirname(file_path)
+                if platform.system() == 'Windows':
+                    subprocess.Popen(f'explorer /select,"{file_path}"')
+                elif platform.system() == 'Darwin':  # macOS
+                    subprocess.call(['open', '-R', file_path])
+                else:  # linux
+                    subprocess.call(['xdg-open', folder])
+            except Exception as ex:
+                self.show_error_message(f"שגיאה בפתיחת התיקייה: {str(ex)}")
+            close_dialog(e)
+
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Row([
+                ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
+                ft.Text("ההצעה נוצרה בהצלחה!", size=20),
+            ]),
+            content=ft.Container(
+                content=ft.Column([
+                    ft.Text(f"הקובץ נשמר ב:", size=16),
+                    ft.Text(file_path, size=14, weight=ft.FontWeight.BOLD, selectable=True),
+                    ft.Container(height=10),
+                    ft.Text("מה תרצה לעשות?", size=16),
+                ], spacing=5),
+                width=500,
+            ),
+            actions=[
+                ft.TextButton(
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.PICTURE_AS_PDF, size=18),
+                        ft.Text("פתח את ה-PDF"),
+                    ]),
+                    on_click=open_pdf,
+                ),
+                ft.TextButton(
+                    content=ft.Row([
+                        ft.Icon(ft.Icons.FOLDER_OPEN, size=18),
+                        ft.Text("פתח תיקייה"),
+                    ]),
+                    on_click=open_folder,
+                ),
+                ft.TextButton(
+                    "סגור",
+                    on_click=close_dialog,
+                ),
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+        )
+
+        self.page.dialog = dialog
+        dialog.open = True
+        self.page.update()
 
     def validate_form(self, customer_data):
         """בדיקת תקינות הטופס"""
@@ -792,76 +837,6 @@ class PanelKitchensApp:
         self.page.update()
         return True
 
-    def show_success_dialog(self, file_path):
-        """הצגת דיאלוג הצלחה"""
-
-        def close_dialog(e):
-            dialog.open = False
-            self.page.update()
-
-        def open_file(e):
-            import subprocess
-            import platform
-            if platform.system() == 'Windows':
-                os.startfile(file_path)
-            else:
-                subprocess.call(['open', file_path])
-            close_dialog(e)
-
-        def open_folder(e):
-            import subprocess
-            import platform
-            folder = os.path.dirname(file_path)
-            if platform.system() == 'Windows':
-                subprocess.Popen(f'explorer /select,"{file_path}"')
-            else:
-                subprocess.call(['open', folder])
-            close_dialog(e)
-
-        dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Row([
-                ft.Icon(ft.Icons.CHECK_CIRCLE, color="#4caf50", size=30),
-                ft.Text("ההצעה נוצרה בהצלחה!", size=20),
-            ]),
-            content=ft.Container(
-                content=ft.Column([
-                    ft.Text(f"הקובץ נשמר בשם:", size=16),
-                    ft.Text(os.path.basename(file_path), size=14, weight=ft.FontWeight.BOLD),
-                    ft.Container(height=10),
-                    ft.Text("מה תרצה לעשות?", size=16),
-                ], spacing=5),
-                width=400,
-            ),
-            actions=[
-                ft.TextButton(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.FOLDER_OPEN, size=18),
-                        ft.Text("פתח תיקייה"),
-                    ]),
-                    on_click=open_folder,
-                ),
-                ft.TextButton(
-                    content=ft.Row([
-                        ft.Icon(ft.Icons.PICTURE_AS_PDF, size=18),
-                        ft.Text("פתח קובץ"),
-                    ]),
-                    on_click=open_file,
-                ),
-                ft.TextButton(
-                    "סגור",
-                    on_click=close_dialog,
-                ),
-            ],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
-
-        self.page.dialog = dialog
-        dialog.open = True
-        self.page.update()
-
-
-
     def reset_form(self, e):
         """איפוס הטופס"""
 
@@ -880,7 +855,7 @@ class PanelKitchensApp:
                 ft.TextButton("ביטול", on_click=close_reset_dialog),
                 ft.ElevatedButton(
                     "אפס",
-                    color=COLORS.WHITE,
+                    color=ft.Colors.WHITE,
                     bgcolor="#f44336",
                     on_click=perform_reset_action,
                 ),
@@ -890,13 +865,11 @@ class PanelKitchensApp:
         dialog.open = True
         self.page.update()
 
-
     def close_dialog(self):
         """סגירת דיאלוג"""
         self.page.dialog.open = False
         self.page.update()
-    
-    
+
     def perform_reset(self):
         """ביצוע איפוס"""
         # Reset form fields
@@ -908,18 +881,18 @@ class PanelKitchensApp:
                     field.content.controls[1].value = f"תאריך: {date.today().strftime('%d/%m/%Y')}"
                 else:
                     field.value = ""
-    
+
         # Reset state
         self.page.data['selected_items'] = []
         self.page.data['catalog_df'] = None
         self.page.data['demo1'] = None
         self.page.data['demo2'] = None
-    
+
         # Reset UI
         self.products_container.visible = False
         self.upload_container.visible = True
         self.tabs.selected_index = 0
-    
+
         # Reset image previews
         if hasattr(self, 'demo1_container'):
             self.demo1_container.content.controls[2] = ft.Container(
@@ -934,7 +907,7 @@ class PanelKitchensApp:
                 border_radius=10,
                 alignment=ft.alignment.center,
             )
-    
+
         if hasattr(self, 'demo2_container'):
             self.demo2_container.content.controls[2] = ft.Container(
                 content=ft.Column([
@@ -948,58 +921,47 @@ class PanelKitchensApp:
                 border_radius=10,
                 alignment=ft.alignment.center,
             )
-    
+
         self.close_dialog()
         self.show_success_message("הטופס אופס בהצלחה")
 
     def show_success_message(self, message):
-        """הצגת הודעת הצלחה בשורת המצב (SnackBar)"""
-        # בונים את ה‑SnackBar
-        self.page.snack_bar = ft.SnackBar(
+        """הצגת הודעת הצלחה"""
+        sb = ft.SnackBar(
             content=ft.Row([
-                ft.Icon(ft.Icons.CHECK_CIRCLE, color=COLORS.WHITE, size=20),
-                ft.Text(message, color=COLORS.WHITE),
+                ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.WHITE, size=20),
+                ft.Text(message, color=ft.Colors.WHITE),
             ]),
             bgcolor="#4caf50",
             duration=3000,
         )
-        # מציגים אותו
-        self.page.snack_bar.open = True
-        # מרעננים את הדף
+        self.page.snack_bar = sb
+        sb.open = True
         self.page.update()
 
     def show_error_message(self, message):
-        """הצגת הודעת שגיאה בשורת המצב (SnackBar)"""
-        # בונים את ה‑SnackBar
-        self.page.snack_bar = ft.SnackBar(
+        """הצגת הודעת שגיאה"""
+        sb = ft.SnackBar(
             content=ft.Row([
-                ft.Icon(ft.Icons.ERROR, color=COLORS.WHITE, size=20),
-                ft.Text(message, color=COLORS.WHITE),
+                ft.Icon(ft.Icons.ERROR, color=ft.Colors.WHITE, size=20),
+                ft.Text(message, color=ft.Colors.WHITE),
             ]),
             bgcolor="#f44336",
             duration=4000,
         )
-        # מציגים אותו
-        self.page.snack_bar.open = True
-        # מרעננים את הדף
+        self.page.snack_bar = sb
+        sb.open = True
         self.page.update()
 
 
 def main(page: ft.Page):
-    print("📱 Main function started")
-    print(f"Page size: {page.window.width}x{page.window.height}")
-    print(f"Page route: {page.route}")
     """נקודת כניסה ראשית"""
-    page.app = PanelKitchensApp(page)
-
+    app = PanelKitchensApp(page)
 
 
 if __name__ == "__main__":
-    print("🎬 Application starting...")
-    try:
-        ft.app(target=main)
-        print("✅ Application ended normally")
-    except Exception as e:
-        print(f"💥 Application crashed: {str(e)}")
-        import traceback
-        traceback.print_exc()
+    # Run the app
+    ft.app(
+        target=main,
+        assets_dir="assets",
+    )
