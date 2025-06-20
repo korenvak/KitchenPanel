@@ -815,6 +815,7 @@ class PanelKitchensApp:
 
             def save_as(e):
                 print("💾 save_as clicked")
+                close_dialog(e)  # סגור את הדיאלוג הנוכחי
                 self.save_picker.save_file(
                     allowed_extensions=["pdf"],
                     file_name=os.path.basename(file_path),
